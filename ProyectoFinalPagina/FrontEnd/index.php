@@ -20,22 +20,49 @@
     <button class="btn btn-outline-success me-2" type="button" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">☰</button>
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">¡Aprende mas de nosotros si te registras!</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
     <div>
-      Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+      ¡Ganaras acceso a nuestros otros proyectos, asi como también a novedades de nuestra empresa!
     </div>
     <div class="dropdown mt-3">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-        Dropdown button
+      <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#formularioModal">
+        Registrate aca.
       </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-      </ul>
+
+      <!-- Modal -->
+<div class="modal fade" id="formularioModal" tabindex="-1" aria-labelledby="formularioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <!-- Encabezado del modal -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="formularioModalLabel">Formulario de contacto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <!-- Cuerpo del modal con el formulario -->
+      <div class="modal-body">
+        <form action="enviar.php" method="POST">
+          <h6>¡En Construcción!</h6>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre">
+          </div>
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="correo" name="correo">
+          </div>
+          <button type="submit" class="btn btn-success">Enviar</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
     </div>
   </div>
 </div>
@@ -52,17 +79,17 @@
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="../Otros/fotos/draftosaurus.webp" class="d-block w-100" alt="...">
+      <img src="../Otros/fotos/drafto.jpg" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
-        <h5 style="color: var(--bs-emphasis-color) !important;">¡Bienvenido a Draftosaurus!</h5>
-        <p style="color: var(--bs-primary);">El juego más divertido de dinosaurios.</p>
+        <h5 class="bg-warning text-dark p-2">¡Bienvenido a Draftosaurus!</h5>
+        <p class="bg-success bg-opacity-50 text-white p-3 rounded">El juego más divertido de dinosaurios.</p>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="../Otros/fotos/Logo_color.jpg" class="d-block w-100" alt="...">
+      <img src="../Otros/fotos/tablerocarousel.jpg" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
-        <h5 class="titulo-carousel">¡Conoce del juego!</h5>
-       <p>Tu objetivo en Draftosaurus es crear el parque de dinosaurios que atraiga a la mayor cantidad de visitantes.
+        <h5 class="bg-warning text-dark p-2">¡Conoce del juego!</h5>
+       <p class="bg-success bg-opacity-50 text-white p-3 rounded">Tu objetivo en Draftosaurus es crear el parque de dinosaurios que atraiga a la mayor cantidad de visitantes.
 Para ello, tienes que seleccionar e intercambiar dinosaurios, y colocarlos en recintos que tienen algunas restricciones de colocación.
 Cada turno, uno de los jugadores lanza el dado, lo cual limita en qué recintos pueden colocar sus dinosaurios el resto de jugadores.
 Draftosaurus es un juego de selección e intercambio rápido y ligero en el que no tienes una mano de cartas que pasar (después de seleccionar una), sino un montón de dinosaurios en la palma de tu mano.</p>
@@ -88,8 +115,8 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
 
 <!-- botones -->
 <div class="container d-flex justify-content-center gap-3 mt-5">
-  <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='tablero.php'">Jugar</button>
-  <button type="button" class="btn btn-secondary btn-lg" onclick="window.location.href='puntaje.php'">Puntuación</button>  
+  <button type="button" class="btn btn-danger btn-lg" onclick="window.location.href='tablero.php'">Jugar</button>
+  <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='puntaje.php'">Puntuación</button>  
 </div>
 
 <!-- Datos -->
@@ -118,8 +145,8 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
     <div class="col-sm-6 col-12">
       <div class="p-3 border bg-light border-3 border-secondary">
         <div class="d-grid gap-2">
-          <button class="btn btn-primary" type="button">Descargar PDF</button>
-          <button class="btn btn-primary" type="button">Sumario</button>
+          <button class="btn btn-danger" type="button">Descargar PDF</button>
+          <button class="btn btn-success" type="button">Sumario</button>
           <button class="btn btn-primary" type="button">PDF ingles</button>
         </div>
        <!-- ACORDEON -->
