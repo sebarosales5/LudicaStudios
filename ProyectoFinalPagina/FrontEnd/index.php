@@ -52,24 +52,27 @@
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="../Otros/fotos/draftosauruslogo.jpg" class="d-block w-100" alt="...">
+      <img src="../Otros/fotos/draftosaurus.webp" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h5 style="color: var(--bs-emphasis-color) !important;">¡Bienvenido a Draftosaurus!</h5>
         <p style="color: var(--bs-primary);">El juego más divertido de dinosaurios.</p>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="../Otros/fotos/Logo_nuevo.jpg" class="d-block w-100" alt="...">
+      <img src="../Otros/fotos/Logo_color.jpg" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h5 class="titulo-carousel">¡Conoce del juego!</h5>
-       <!-- <p>Some representative placeholder content for the second slide.</p>-->
+       <p>Tu objetivo en Draftosaurus es crear el parque de dinosaurios que atraiga a la mayor cantidad de visitantes.
+Para ello, tienes que seleccionar e intercambiar dinosaurios, y colocarlos en recintos que tienen algunas restricciones de colocación.
+Cada turno, uno de los jugadores lanza el dado, lo cual limita en qué recintos pueden colocar sus dinosaurios el resto de jugadores.
+Draftosaurus es un juego de selección e intercambio rápido y ligero en el que no tienes una mano de cartas que pasar (después de seleccionar una), sino un montón de dinosaurios en la palma de tu mano.</p>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="../Otros/fotos/pasto1.jpg" class="d-block w-100" alt="...">
+      <img src="../Otros/fotos/draftosaurus_detalle_tirano.webp" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
         <h5 style="color: var(--bs-body-color);">Detalles de los desarrolladores</h5>
-        <p>Some representative placeholder content for the third slide.</p>
+        
       </div>
     </div>
   </div>
@@ -85,8 +88,8 @@
 
 <!-- botones -->
 <div class="container d-flex justify-content-center gap-3 mt-5">
-  <button type="button" class="btn btn-primary btn-lg">Jugar</button>
-  <button type="button" class="btn btn-secondary btn-lg">Puntuación</button>  
+  <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='tablero.php'">Jugar</button>
+  <button type="button" class="btn btn-secondary btn-lg" onclick="window.location.href='puntaje.php'">Puntuación</button>  
 </div>
 
 <!-- Datos -->
@@ -115,9 +118,9 @@
     <div class="col-sm-6 col-12">
       <div class="p-3 border bg-light border-3 border-secondary">
         <div class="d-grid gap-2">
-          <button class="btn btn-primary" type="button">Button</button>
-          <button class="btn btn-primary" type="button">Button</button>
-          <button class="btn btn-primary" type="button">Button</button>
+          <button class="btn btn-primary" type="button">Descargar PDF</button>
+          <button class="btn btn-primary" type="button">Sumario</button>
+          <button class="btn btn-primary" type="button">PDF ingles</button>
         </div>
        <!-- ACORDEON -->
         <div class="accordion" id="accordionExample">
@@ -167,7 +170,63 @@
 
 
 <!-- footer -->
-
+ <footer class="bd-footer py-5 mt-5 bg-light">
+  <div class="container py-5">
+    <div class="row">
+      <div class="col-lg-3 mb-3">
+        <a class="d-inline-flex align-items-center mb-2 link-dark text-decoration-none" href="/" aria-label="Bootstrap">
+          <span class="fs-5">Ludica Studios</span>
+        </a>
+        <ul class="list-unstyled small text-muted">
+          <li class="mb-2">Diseñado y construido con todo el esfuerzo de nuestro <a href="https://">equipo</a> y con la ayuda de nuestros <a href="https://chatgpt.com"> contribuidores</a>.</li>
+          <li class="mb-2">Code licensed <a href="https://github.com/twbs/bootstrap/blob/main/LICENSE" target="_blank" rel="license noopener">MIT</a>, docs <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="license noopener">CC BY 3.0</a>.</li>
+          <li class="mb-2">Currently v5.0.2.</li>
+          <li class="mb-2">Analytics by <a href="https://usefathom.com/ref/ADZSBE" target="_blank" rel="noopener">Fathom</a>.</li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-1 mb-3">
+        <h5>Links</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/">Home</a></li>
+          <li class="mb-2"><a href="/docs/5.0/">Docs</a></li>
+          <li class="mb-2"><a href="/docs/5.0/examples/">Brashan puto</a></li>
+          <li class="mb-2"><a href="https://themes.getbootstrap.com/">Maxi puto</a></li>
+          <li class="mb-2"><a href="https://blog.getbootstrap.com/">Blog de creación</a></li>
+          <li class="mb-2"><a href="https://cottonbureau.com/people/bootstrap">Swag Store</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 mb-3">
+        <h5>Ludica Studios</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/docs/5.0/getting-started/">Getting started</a></li>
+          <li class="mb-2"><a href="/docs/5.0/examples/starter-template/">Starter template</a></li>
+          <li class="mb-2"><a href="/docs/5.0/getting-started/webpack/">Webpack</a></li>
+          <li class="mb-2"><a href="/docs/5.0/getting-started/parcel/">Parcel</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 mb-3">
+        <h5>Otros proyectos</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="https://github.com/twbs/bootstrap">Bootstrap 5</a></li>
+          <li class="mb-2"><a href="https://github.com/twbs/bootstrap/tree/v4-dev">Bootstrap 4</a></li>
+          <li class="mb-2"><a href="https://github.com/twbs/icons">Icons</a></li>
+          <li class="mb-2"><a href="https://github.com/twbs/rfs">RFS</a></li>
+          <li class="mb-2"><a href="https://github.com/twbs/bootstrap-npm-starter">npm starter</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 mb-3">
+        <h5>Contribuir</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="https://github.com/twbs/bootstrap/issues">Issues</a></li>
+          <li class="mb-2"><a href="https://github.com/twbs/bootstrap/discussions">Discussions</a></li>
+          <li class="mb-2"><a href="https://github.com/sponsors/twbs">Corporate sponsors</a></li>
+          <li class="mb-2"><a href="https://opencollective.com/bootstrap">Open Collective</a></li>
+          <li class="mb-2"><a href="https://stackoverflow.com/questions/tagged/bootstrap-5">Stack Overflow</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
     <!--  Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </body>
