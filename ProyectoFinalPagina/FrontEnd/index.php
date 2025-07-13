@@ -165,9 +165,36 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
         <h5 class="modal-title" id="modalSumarioLabel">Sumario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
-
       <div class="modal-body">
-        Aquí va el contenido del sumario. Podés poner texto, imágenes, listas, o lo que necesites.
+        <p class="fw-bold">Objetivo</p>
+        <p>Elije dinosaurios y colócalos en diferentes zonas para conseguir el mayor número de puntos.</p>
+        <p class="fw-bold">Jugabilidad</p>
+        <p>Se elige el lado del tablero: verano (nivel inicial) o invierno (nivel experto)
+         <br> El juego consta de 2 rondas (4 para 2 jugadores)
+          Cada jugador saca 6 dinosaurios de la bolsa.
+        <br>  El jugador con el dado de colocación lo lanza.
+        <br>  Cada jugador elige un dinosaurio y lo coloca en su zoo al mismo tiempo, siguiendo las reglas del dado de colocación (excepto el rodillo, que puede colocarse en cualquier lugar).
+        <br>  A continuación, cada jugador descarta uno de los dinosaurios restantes (puedes imaginar que lo han prestado a un zoológico de mascotas en el extranjero)
+         <br> Cada jugador pasa su bolsa de dinosaurios y su dado de colocación (si lo tenía) a su izquierda.
+         <br> Repite hasta que todos los dinosaurios estén colocados.
+         <br> Después de 2 rondas, se procede a la puntuación.
+         <br> Al final del juego habrán colocado 12 dinosaurios: 6 en la ronda 1, 6 en la ronda 2.
+         <br> En caso de empate, gana el jugador que tenga menos T-Rex. Si siguen empatados, los jugadores se reparten la victoria.
+         <br> Hay 6 especies de dinosaurios, distribuidos de la siguiente manera:
+         <br> 5p: 60 dinos. 10 x 6 especies diferentes
+         <br> 4p: 48 dinos. 8 x 6 especies diferentes
+        <br> 3p: 36 dinos. 6 x 6 especies diferentes
+          <br> 2p: 48 dinos. 8 x 6 especies diferentes</p>
+          <p class="fw-bold">Dado de colocación</p>
+        <p>Pastizales/bosques: Debes colocar el dinosaurio en una zona de pradera(marrón)/bosque(verde).
+           <br> Patio de comidas/Café: Debes colocar el dinosaurio en un área a la izquierda/derecha.
+            <br>Corral vacío: Debes colocar al dinosaurio en un corral vacío.
+           <br> Cuidado con el T-Rex: Debes colocar al dinosaurio en un corral sin T-Rex (rojo).</p>
+           <p class="fw-bold">Tablero</p>
+        <p>Cada zoológico tiene 6 corrales y un río.
+           <br>Río: No se trata como un corral. Cada dinosaurio en él proporciona 1 punto.
+           <br>T-Rex: Cada corral con al menos 1 T-Rex en él aporta 1 punto extra.</p>
+          
       </div>
 
       <div class="modal-footer">
@@ -186,36 +213,36 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Accordion Item #1
-      </button>
+        Objetivo
+      </buton>
     </h2>
     <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        <strong>This is the first item’s accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+        <strong>En Draftosaurus,</strong> Eligir dinosaurios y colocarlos en diferentes zonas para conseguir el mayor número de puntos es la clave de la victoria.
       </div>
     </div>
   </div>
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Accordion Item #2
+        Dinosaurios
       </button>
     </h2>
     <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        <strong>This is the second item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+        <strong>Hay 6 tipos diferentes de dinosaurios.</strong> Dependiendo de la cantidad de jugadores, se aumenta o resta el numero de dinosaurios que existiran dentro de la bolsa.
       </div>
     </div>
   </div>
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Accordion Item #3
+        Las zonas del zoo y el dado de colocación
       </button>
     </h2>
     <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+        <strong>Son la clave para aumentar los puntos.</strong> Factores como la cantidad de T-Rex, la zona que habilite el dado y el dinosaurio que tengas disponible para colocar, permitirán al jugador alcanzar la mayor cantidad de puntos posibles.
       </div>
     </div>
   </div>
@@ -249,8 +276,8 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
         <ul class="list-unstyled">
           <li class="mb-2"><a href="ludica.php">Página de LudicaStudios </a></li>
           <li class="mb-2"><a href="https://github.com/sebarosales5">GitHub</a></li>
-          <li class="mb-2"><a href="/docs/5.0/examples/">Instagram</a></li>
-          <li class="mb-2"><a href="https://themes.getbootstrap.com/">Cuenta de X</a></li>
+          <li class="mb-2"><a href="/">Instagram</a></li>
+          <li class="mb-2"><a href="/">Cuenta de X</a></li>
         </ul>
       </div>
       <div class="col-6 col-lg-4 mb-3">
