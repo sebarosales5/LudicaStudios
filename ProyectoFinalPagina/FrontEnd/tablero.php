@@ -14,7 +14,7 @@
     <div class="container text-center">
   <div class="row">
     <div class="col">
-        <img src="../Otros/fotos/Tablero.jpeg" class="img-fluid" alt="el tablero horrible de maxi">
+        <img src="../Otros/fotos/Tablero.jpeg" class="img-fluid" alt="el tablero de maxi">
     </div>
     <div class="container">
   <div class="row">

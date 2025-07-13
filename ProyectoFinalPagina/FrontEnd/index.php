@@ -155,7 +155,29 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
       <div class="p-3 border bg-light border-3 border-secondary">
         <div class="d-grid gap-2">
           <a href="../Otros/descargas/instruccionesE.pdf" download class="btn btn-danger" type="button">Descargar PDF con instrucciones en español</a>
-          <button class="btn btn-success" type="button">Sumario</button>
+          <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalSumario">Sumario</button>
+          <!-- MODAL DEL SUMARIO -->
+          <div class="modal fade" id="modalSumario" tabindex="-1" aria-labelledby="modalSumarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalSumarioLabel">Sumario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        Aquí va el contenido del sumario. Podés poner texto, imágenes, listas, o lo que necesites.
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+        <!-- END -->
           <a href="../Otros/descargas/instruccionesI.pdf" download class="btn btn-primary" type="button">Descargar PDF con instrucciones en inglés</a>
         </div>
 

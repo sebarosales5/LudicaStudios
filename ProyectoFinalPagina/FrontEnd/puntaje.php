@@ -8,20 +8,52 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>Puntaje final</title>
   </head>
-  <body>
-    <h1>Hello, world!</h1>
+  <body class="bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="ludica.php">Ludica Studios</a>
+    </button>
+          <img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle ms-auto" onclick="window.location.href='index.php'">
+    </div>
+  </div>
+</nav>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container text-center" style="max-width: 400px;">
+      
+      <h4 class="mb-4 bg-danger py-2 px-2 rounded-1">Ingresá los puntajes:</h4>
+
+      <input type="number" class="form-control mb-3" placeholder="Puntaje Jugador 1">
+      <input type="number" class="form-control mb-3" placeholder="Puntaje Jugador 2">
+      <input type="number" class="form-control mb-3" placeholder="Puntaje Jugador 3">
+      <input type="number" class="form-control mb-3" placeholder="Puntaje Jugador 4">
+      <input type="number" class="form-control mb-3" placeholder="Puntaje Jugador 5">
+      
+
+      <button class="btn btn-primary w-100">Enviar</button>
+      
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
   </body>
 </html>
