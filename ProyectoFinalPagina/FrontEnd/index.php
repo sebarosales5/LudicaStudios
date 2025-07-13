@@ -18,7 +18,9 @@
             <nav class="navbar navbar-light bg-light">
   <form class="container-fluid justify-content-start">
     <button class="btn btn-outline-success me-2" type="button" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">☰</button>
+    <img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle ms-auto">
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+      <p class="text-center"><img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle me-auto"></p>
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">¡Aprende mas de nosotros si te registras!</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -98,7 +100,9 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
     <div class="carousel-item">
       <img src="../Otros/fotos/draftosaurus_detalle_tirano.webp" class="d-block w-100" alt="...">
       <div class="carousel-caption d-none d-md-block">
-        <h5 style="color: var(--bs-body-color);">Detalles de los desarrolladores</h5>
+        <h5 class="bg-warning text-dark p-2">Detalles del juego</h5>
+        <p class="bg-success bg-opacity-50 text-white p-3 rounded">Desarrollado por Antoine Bauza, Corentin Lebrat, Ludovic Maublanc, Theo Riviere</p>
+        <p class="bg-success bg-opacity-50 text-white p-3 rounded">Ilustrado por Jiahui Eva Gao, Roman Kucharski, Vipin Alex Jacob</p>
         
       </div>
     </div>
@@ -122,8 +126,14 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
 <!-- Datos -->
   <div class="container mt-5 mb-5 bg-light text-black border border-3 border-secondary">
     <div class="row">
-      <div class="col-sm-7 py-4 px-3 col-12"> Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci rem blanditiis dolores neque expedita distinctio at consectetur similique, iste soluta aliquid quia magnam, numquam eius qui molestiae et veritatis incidunt.</div>
-      <div class="col-sm-5 py-4 px-3 col-12"> Lorem ipsum dolor sit amet consectetur adipisicing elit. In, aperiam! Ipsa suscipit nesciunt, nam perferendis quos quidem recusandae repellendus quibusdam numquam provident hic corporis expedita laborum quam qui sed laudantium!</div>
+      <div class="col-sm-7 py-4 px-3 col-12"> 
+        <h4 class="text-success text-center fw-bold">LUDICA STUDIOS</h5>  
+         <p class="pt-3 px-4 fs-5">Ludica Studios trabaja para que los mejores juegos de mesa estén a tu alcance, ¡Sin instalaciones y sin gastos!</p>
+      </div>
+      <div class="col-sm-5 py-4 px-3 col-12"> 
+        <p class="text-center"><img src="../Otros/fotos/Logo_color.jpg" class="rounded" style="width: 200px; height: 150px;" alt="Ejemplo"></p>
+        <p class="text-center"><button type="button" class="btn btn-outline-success" onclick="window.location.href='ludica.php'">¡Visita nuestra web!</button></p>
+      </div>
     </div>
   </div>
 
@@ -134,21 +144,21 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
      <div class="p-3 border bg-light border-3 border-secondary">
       <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Estadisticas</h5>
+            <h5 class="card-title text-center fs-3 text-danger fw-bold">Estadísticas</h5>
             <p class="card-text"></p>
-            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
           </div>
-          <img src="../Otros/fotos/pasto1.jpg" class="card-img-bottom" alt="...">
+          <img src="../Otros/fotos/Detalles.png" class="card-img-bottom" alt="ficha con información">
         </div>
      </div>
     </div>
     <div class="col-sm-6 col-12">
       <div class="p-3 border bg-light border-3 border-secondary">
         <div class="d-grid gap-2">
-          <button class="btn btn-danger" type="button">Descargar PDF</button>
+          <a href="../Otros/descargas/instruccionesE.pdf" download class="btn btn-danger" type="button">Descargar PDF con instrucciones en español</a>
           <button class="btn btn-success" type="button">Sumario</button>
-          <button class="btn btn-primary" type="button">PDF ingles</button>
+          <a href="../Otros/descargas/instruccionesI.pdf" download class="btn btn-primary" type="button">Descargar PDF con instrucciones en inglés</a>
         </div>
+
        <!-- ACORDEON -->
         <div class="accordion" id="accordionExample">
   <div class="accordion-item">
@@ -201,37 +211,40 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
   <div class="container py-5">
     <div class="row">
       <div class="col-lg-3 mb-3">
-        <a class="d-inline-flex align-items-center mb-2 link-dark text-decoration-none" href="/" aria-label="Bootstrap">
-          <span class="fs-5">Ludica Studios</span>
+        <a class="d-inline-flex align-items-center mb-2 link-dark text-decoration-none" href="ludica.php" aria-label="Bootstrap">
+          <img src="../Otros/fotos/Logo_color.jpg" alt="Usuario" width="40" height="40" class="rounded-circle me-auto">
+          <span class="fs-5 ps-4">Ludica Studios</span>
+
         </a>
         <ul class="list-unstyled small text-muted">
-          <li class="mb-2">Diseñado y construido con todo el esfuerzo de nuestro <a href="https://">equipo</a> y con la ayuda de nuestros <a href="https://chatgpt.com"> contribuidores</a>.</li>
-          <li class="mb-2">Code licensed <a href="https://github.com/twbs/bootstrap/blob/main/LICENSE" target="_blank" rel="license noopener">MIT</a>, docs <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="license noopener">CC BY 3.0</a>.</li>
-          <li class="mb-2">Currently v5.0.2.</li>
-          <li class="mb-2">Analytics by <a href="https://usefathom.com/ref/ADZSBE" target="_blank" rel="noopener">Fathom</a>.</li>
+          <li class="mb-2">Diseñado y construido con todo el esfuerzo de nuestro <a href="ludica.php">equipo</a> y con la ayuda de nuestros <a href="https://chatgpt.com"> contribuidores</a>.</li>
+          <li class="mb-2">Actualmente v1.0.0.</li>
+          <li class="mb-2">Actualizado por <a href="https://github.com/sebarosales5" target="_blank" rel="noopener">sebarosales5</a>.</li>
         </ul>
       </div>
-      <div class="col-6 col-lg-2 offset-lg-1 mb-3">
+      <div class="col-6 col-lg-4 offset-lg-1 mb-3">
         <h5>Links</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="/">Home</a></li>
-          <li class="mb-2"><a href="/docs/5.0/">Docs</a></li>
-          <li class="mb-2"><a href="/docs/5.0/examples/">Brashan puto</a></li>
-          <li class="mb-2"><a href="https://themes.getbootstrap.com/">Maxi puto</a></li>
-          <li class="mb-2"><a href="https://blog.getbootstrap.com/">Blog de creación</a></li>
-          <li class="mb-2"><a href="https://cottonbureau.com/people/bootstrap">Swag Store</a></li>
+          <li class="mb-2"><a href="ludica.php">Página de LudicaStudios </a></li>
+          <li class="mb-2"><a href="https://github.com/sebarosales5">GitHub</a></li>
+          <li class="mb-2"><a href="/docs/5.0/examples/">Instagram</a></li>
+          <li class="mb-2"><a href="https://themes.getbootstrap.com/">Cuenta de X</a></li>
         </ul>
       </div>
-      <div class="col-6 col-lg-2 mb-3">
+      <div class="col-6 col-lg-4 mb-3">
         <h5>Ludica Studios</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="/docs/5.0/getting-started/">Getting started</a></li>
-          <li class="mb-2"><a href="/docs/5.0/examples/starter-template/">Starter template</a></li>
-          <li class="mb-2"><a href="/docs/5.0/getting-started/webpack/">Webpack</a></li>
-          <li class="mb-2"><a href="/docs/5.0/getting-started/parcel/">Parcel</a></li>
+          <li class="mb-2"><a href="ludica.php">Pagina principal</a></li>
+ <!-- 
+          <li class="mb-2"><a href="...">PlaceHolder</a></li>
+          <li class="mb-2"><a href="...">PlaceHolder</a></li>
+          <li class="mb-2"><a href="...">PlaceHolder</a></li>
+          -->
         </ul>
       </div>
-      <div class="col-6 col-lg-2 mb-3">
+       <!--
+
+      <div class="col-6 col-lg-2 modificar los "4" por "2" en esta parte en las dos estructuras de arriba cuando descomentemos mb-3">
         <h5>Otros proyectos</h5>
         <ul class="list-unstyled">
           <li class="mb-2"><a href="https://github.com/twbs/bootstrap">Bootstrap 5</a></li>
@@ -241,6 +254,7 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
           <li class="mb-2"><a href="https://github.com/twbs/bootstrap-npm-starter">npm starter</a></li>
         </ul>
       </div>
+
       <div class="col-6 col-lg-2 mb-3">
         <h5>Contribuir</h5>
         <ul class="list-unstyled">
@@ -251,6 +265,9 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
           <li class="mb-2"><a href="https://stackoverflow.com/questions/tagged/bootstrap-5">Stack Overflow</a></li>
         </ul>
       </div>
+
+          -->
+
     </div>
   </div>
 </footer>
