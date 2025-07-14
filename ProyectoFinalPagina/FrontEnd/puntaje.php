@@ -10,6 +10,7 @@
 
     <title>Puntaje final</title>
   </head>
+  <!-- NAV -->
   <body class="bg-dark">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
@@ -19,6 +20,7 @@
     </div>
   </div>
 </nav>
+<!-- formulario de puntajes -->
   <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="container text-center" style="max-width: 400px;">
       

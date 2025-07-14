@@ -276,8 +276,8 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
         <ul class="list-unstyled">
           <li class="mb-2"><a href="ludica.php">Página de LudicaStudios </a></li>
           <li class="mb-2"><a href="https://github.com/sebarosales5">GitHub</a></li>
-          <li class="mb-2"><a href="/">Instagram</a></li>
-          <li class="mb-2"><a href="/">Cuenta de X</a></li>
+          <li class="mb-2"><a href="https://www.instagram.com/ludicastudios4/">Instagram</a></li>
+          <li class="mb-2"><a href="https://x.com/LudicaStudios">Cuenta de X</a></li>
         </ul>
       </div>
       <div class="col-6 col-lg-4 mb-3">

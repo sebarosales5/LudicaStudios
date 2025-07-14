@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Contador Regresivo</title>
+  <title>Ludica Studios</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light text-center py-5">
 
+<!-- titulo -->
   <h2 class="mb-4 text-success">¡EN CONSTRUCCIÓN! Vuelva el 15 de septiembre</h2>
   <div id="contador" class="fs-3 text-dark fw-bold"></div>
 
