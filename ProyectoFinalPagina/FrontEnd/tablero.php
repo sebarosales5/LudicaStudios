@@ -1,32 +1,58 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="estilos.css">
 
     <title>Partida Draftosaurus</title>
   </head>
-  <body>
-    <div class="container text-center">
-  <div class="row">
-    <div class="col">
-        <img src="../Otros/fotos/Tablero.jpeg" class="img-fluid" alt="el tablero de maxi">
-    </div>
-    <div class="container">
-  <div class="row">
-    <div class="col">
- <img src="../Otros/fotos/dinosaurios.png" class="img-fluid" alt="los dinosaurios de maxi">
-    </div>
+  <body class="bg-custom"> <!-- clase para fondo -->
+    
+    <div class="container py-4">
+      
+      <!-- TABLERO -->
+      <div class="d-flex justify-content-center mb-3">
+        <div class="mapa">
+          <img src="../Otros/fotos/Tablero_final.jpg" alt="Mapa zoológico">
+          <div class="zona" id="zona1"></div>
+          <div class="zona" id="zona2"></div>
+          <div class="zona" id="zona3"></div>
+          <div class="zona" id="zona4"></div>
+          <div class="zona" id="zona5"></div>
+          <div class="zona" id="zona6"></div>
+          <div class="zona" id="zona7"></div>
+        </div>
+      </div>
+
+<!-- Contenedor único para los dinos -->
+<div class="d-flex flex-wrap justify-content-center bg-light border border-3 border-danger" style="max-width: 320px; margin: auto; gap: 10px;">
+
+  <div class="dino" draggable="true" id="trex">
+    <img src="../Otros/fotos/dino_rojo.png" alt="T-Rex">
+  </div>
+  <div class="dino" draggable="true" id="triceratops">
+    <img src="../Otros/fotos/dino_amarillo.png" alt="Triceratops">
+  </div>
+  <div class="dino" draggable="true" id="stegosaurus">
+    <img src="../Otros/fotos/dino_azul.png" alt="Stegosaurus">
+  </div>
+  <div class="dino" draggable="true" id="brontosaurus">
+    <img src="../Otros/fotos/dino_morado.png" alt="Brontosaurus">
+  </div>
+  <div class="dino" draggable="true" id="parasaurus">
+    <img src="../Otros/fotos/dino_verde.png" alt="Parasaurus">
+  </div>
+  <div class="dino" draggable="true" id="spinosaurus">
+    <img src="../Otros/fotos/dino_naranja.png" alt="Spinosaurus">
+  </div>
+
+</div>
 
 
-
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
+    <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="tablero.js"></script>
   </body>
 </html>

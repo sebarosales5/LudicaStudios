@@ -1,3 +1,22 @@
+<?php
+session_start();
+?>
+<?php
+$host = 'localhost'; // o IP del servidor de BD
+$db = 'draftosaurio';
+$user = 'root';
+$pass = '';
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+// Verifica la conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
+}
+
+//echo "Conectado a la base de datos draftosaurio!";
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
     <!-- css normal-->
      <link rel="stylesheet" href="styles.css">
 
@@ -13,63 +32,120 @@
 </head>
     <body>
 
-    <!-- Boton de costado --> 
+   <!-- Boton de costado --> 
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
 
-            <nav class="navbar navbar-light bg-light">
-  <form class="container-fluid justify-content-start">
-    <button class="btn btn-outline-success me-2" type="button" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">☰</button>
+    <!-- Botón lateral -->
+    <button class="btn btn-outline-success me-2" type="button" data-bs-toggle="offcanvas" 
+            href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+      ☰
+    </button>
     <img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle ms-auto">
+
+    <!-- Offcanvas -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-      <p class="text-center"><img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle me-auto"></p>
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">¡Aprende mas de nosotros si te registras!</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div>
-      ¡Ganaras acceso a nuestros otros proyectos, asi como también a novedades de nuestra empresa!
-    </div>
-    <div class="dropdown mt-3">
-      <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#formularioModal">
-        Registrate aca.
-      </button>
-
-      <!-- Modal -->
-<div class="modal fade" id="formularioModal" tabindex="-1" aria-labelledby="formularioModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <!-- Encabezado del modal -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="formularioModalLabel">Formulario de contacto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+          <?php echo isset($_SESSION['usuario']) ? "Bienvenido" : "Para continuar, registrate o inicia sesión."; ?>
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
 
-      <!-- Cuerpo del modal con el formulario -->
-      <div class="modal-body">
-        <form action="enviar.php" method="POST">
-          <h6>¡En Construcción!</h6>
-          <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre">
+      <div class="offcanvas-body">
+        <?php if (isset($_SESSION['usuario'])): ?>
+          <div class="d-flex align-items-center mb-3">
+            <img src="../Otros/fotos/dinosaurioperoacolor.jpg" alt="Usuario" width="40" height="40" class="rounded-circle me-2">
+            <span>👋 Hola, <?php echo htmlspecialchars($_SESSION['usuario']['nombre']); ?></span>
           </div>
-          <div class="mb-3">
-            <label for="correo" class="form-label">Correo electrónico</label>
-            <input type="email" class="form-control" id="correo" name="correo">
+
+          <!-- Botón solo para admins -->
+          <?php if (isset($_SESSION['usuario']['rol']) && $_SESSION['usuario']['rol'] === 'admin'): ?>
+            <a href="../Datos/adminUser.php" class="btn btn-warning mb-3">Gestionar usuarios</a>
+          <?php endif; ?>
+
+          <a href="../BackEnd/logout.php" class="btn btn-outline-danger mb-3">Cerrar sesión</a>
+
+        <?php else: ?>
+          <div>
+             ¡Ganarás acceso a nuestros otros proyectos, así como también a novedades de nuestra empresa y podrás jugar a los juegos que ya tenemos!
           </div>
-          <button type="submit" class="btn btn-success">Enviar</button>
-        </form>
+
+          <button type="button" class="btn btn-primary btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#formularioModal">
+            Registrate o Inicia Sesión
+          </button>
+
+          <!-- Modal de registro/login -->
+          <div class="modal fade" id="formularioModal" tabindex="-1" aria-labelledby="formularioModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="formularioModalLabel">Bienvenido</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <?php
+                if (isset($_SESSION['message']) && $_SESSION['message']) {
+                  printf('<div class="alert alert-info m-2">%s</div>', $_SESSION['message']);
+                  unset($_SESSION['message']);
+                }
+                ?>
+
+                <ul class="nav nav-tabs" id="authTab" role="tablist">
+                  <li class="nav-item">
+                    <button class="nav-link active" id="registro-tab" data-bs-toggle="tab" data-bs-target="#registro" type="button" role="tab">Registrarse</button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Iniciar sesión</button>
+                  </li>
+                </ul>
+
+                <div class="tab-content p-3">
+                  <div class="tab-pane fade show active" id="registro" role="tabpanel">
+                    <form action="../BackEnd/registro.php" method="POST">
+                      <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" name="nombre" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" name="correo" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" name="contrasena" required>
+                      </div>
+                      <button type="submit" class="btn btn-success">Registrarse</button>
+                    </form>
+                  </div>
+
+                  <div class="tab-pane fade" id="login" role="tabpanel">
+                    <form action="../BackEnd/login.php" method="POST">
+                      <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" name="correo" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" name="contrasena" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                    </form>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        <?php endif; ?>
       </div>
-
     </div>
-  </div>
-</div>
 
-    </div>
   </div>
-</div>
-  </form>
-            </nav>
+</nav>
+
+
 
 <!-- Carrusel -->
 
@@ -119,7 +195,7 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
 
 <!-- botones -->
 <div class="container d-flex justify-content-center gap-3 mt-5">
-  <button type="button" class="btn btn-danger btn-lg" onclick="window.location.href='tablero.php'">Jugar</button>
+  <button type="button" class="btn btn-danger btn-lg" onclick="window.location.href='creaJuego.php'">Jugar</button>
   <button type="button" class="btn btn-primary btn-lg" onclick="window.location.href='puntaje.php'">Puntuación</button>  
 </div>
 
@@ -321,7 +397,7 @@ Draftosaurus es un juego de selección e intercambio rápido y ligero en el que 
   </div>
 </footer>
     <!--  Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
     </body>
     
 </html>

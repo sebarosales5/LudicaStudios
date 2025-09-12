@@ -1,0 +1,57 @@
+body {
+  background-image: url("../Otros/fotos/fondo3.png"); /* ruta de tu imagen */
+  background-size: cover;      /* ocupa toda la pantalla */
+  background-position: center; /* centrada */
+  background-repeat: no-repeat;
+  min-height: 100vh;           /* asegura que cubra todo el alto */
+}
+
+.dino {
+  width: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: grab;
+  text-align: center;
+}
+
+.dino img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+ 
+.mapa {
+  position: relative;
+  max-width: 410px;   /* límite máximo */
+  width: 100%;        /* se adapta en pantallas chicas */
+  margin: auto;       /* centrado */
+  border: 2px solid red; /* 👈 para ver el tamaño real del contenedor */
+}
+
+.mapa img {
+  width: 100%;  /* se adapta al ancho del contenedor */
+  height: auto;
+  display: block;
+}
+
+
+.zona {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Evita que el contenido se estire */
+  flex: none;
+}
+
+
+/* Posiciones relativas */
+#zona1 { top: 3%; left: 3%; width: 37%; height: 25%; }
+#zona2 { top: 70%; left: 67%; width: 26%; height: 25%; }
+#zona3 { top: 3%; left: 74%; width: 20%; height: 17%; }
+#zona4 { top: 40%; left: 5%; width: 20%; height: 20%; }
+#zona5 { top: 70%; left: 5%; width: 25%; height: 25%; }
+#zona6 { top: 41%; left: 61%; width: 35%; height: 25%; }
+#zona7 { top: 30%; left: 35%; width: 20%; height: 60%; }

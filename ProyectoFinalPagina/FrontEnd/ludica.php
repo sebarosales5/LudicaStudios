@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Ludica Studios</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
 </head>
 <body class="bg-light text-center py-5">
 
@@ -12,7 +12,7 @@
   <div id="contador" class="fs-3 text-dark fw-bold"></div>
 
   <script>
-    const destino = new Date("2025-09-15T00:00:00").getTime();
+    const destino = new Date("2025-11-15T00:00:00").getTime();
 
     const actualizarContador = () => {
       const ahora = new Date().getTime();
@@ -35,7 +35,9 @@
 
     const intervalo = setInterval(actualizarContador, 1000);
     actualizarContador(); // Mostrar de inmediato sin esperar 1 segundo
-  </script>
 
+    
+  </script>
+ <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
