@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -33,7 +34,11 @@ $stmt->close();
 $conn->close();
 
 if (empty($invalid)) {
-    echo json_encode(["success" => true]);
+    // Guardar en sesión la configuración de la partida
+    $_SESSION['num_players'] = count($jugadores);
+    $_SESSION['players'] = $jugadores;
+
+    echo json_encode(["success" => true, "num_players" => $_SESSION['num_players']]);
 } else {
     echo json_encode(["success" => false, "invalid" => $invalid]);
 }
