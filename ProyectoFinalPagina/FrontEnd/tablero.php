@@ -14,6 +14,7 @@
     <?php 
     session_start(); 
     $players = isset($_SESSION['players']) ? $_SESSION['players'] : ['Jugador 1', 'Jugador 2'];
+    $player_ids = isset($_SESSION['player_ids']) ? $_SESSION['player_ids'] : [0, 0];
     $num_players = count($players);
     ?>
     <div class="container py-4">
@@ -22,7 +23,8 @@
         console.log('Sesión PHP:', <?php echo json_encode($_SESSION); ?>);
         const NUM_PLAYERS = <?php echo $num_players; ?>;
         const PLAYER_NAMES = <?php echo json_encode($players); ?>;
-        console.log('Variables inicializadas:', { NUM_PLAYERS, PLAYER_NAMES });
+        const PLAYER_IDS = <?php echo json_encode($player_ids); ?>;
+        console.log('Variables inicializadas:', { NUM_PLAYERS, PLAYER_NAMES, PLAYER_IDS });
       </script>
 
       <!-- Pestañas de navegación -->
@@ -121,7 +123,6 @@
                   <hr>
                   <div class="d-grid gap-2">
                     <button class="btn btn-outline-primary btn-sm" id="player<?php echo $index; ?>-btn-mostrar-log">Ver detalles</button>
-                    <button class="btn btn-outline-success btn-sm" id="player<?php echo $index; ?>-btn-guardar">Guardar estado</button>
                   </div>
                 </div>
               </div>
@@ -240,6 +241,49 @@
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
       </style>
+    </div>
+
+    <!-- Modal de fin de partida -->
+    <div class="modal fade" id="modalFinPartida" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalFinPartidaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalFinPartidaLabel">🏆 ¡Fin de la Partida!</h5>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <h2 class="display-4">🎉 ¡Felicitaciones!</h2>
+              <h3 id="ganador-nombre" class="text-success"></h3>
+              <p class="lead">Ha ganado la partida</p>
+            </div>
+            
+            <hr>
+            
+            <h5 class="mb-3">Resultados finales:</h5>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th scope="col">Posición</th>
+                    <th scope="col">Jugador</th>
+                    <th scope="col">Puntuación</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-resultados">
+                  <!-- Se llenará dinámicamente con JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="alert alert-info mt-3" role="alert">
+              <strong>✅ Los resultados han sido guardados automáticamente en la base de datos.</strong>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">Volver al inicio</button>
+          </div>
+        </div>
+      </div>
     </div>
 
 

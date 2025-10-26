@@ -19,7 +19,8 @@ $data = json_decode(file_get_contents("php://input"), true);
 $jugadores = $data["jugadores"] ?? [];
 
 $invalid = [];
-$stmt = $conn->prepare("SELECT Id_usuario FROM usuario WHERE Nombre_jugador = ?");
+$valid_players = [];
+$stmt = $conn->prepare("SELECT Id_usuario, Nombre_jugador FROM usuario WHERE Nombre_jugador = ?");
 foreach ($jugadores as $nombre) {
     $nombre = trim($nombre);
     $stmt->bind_param("s", $nombre);
@@ -28,15 +29,22 @@ foreach ($jugadores as $nombre) {
 
     if ($result->num_rows === 0) {
         $invalid[] = $nombre;
+    } else {
+        $row = $result->fetch_assoc();
+        $valid_players[] = [
+            'id' => $row['Id_usuario'],
+            'nombre' => $row['Nombre_jugador']
+        ];
     }
 }
 $stmt->close();
 $conn->close();
 
 if (empty($invalid)) {
-    // Guardar en sesión la configuración de la partida
-    $_SESSION['num_players'] = count($jugadores);
-    $_SESSION['players'] = $jugadores;
+    // Guardar en sesión la configuración de la partida con IDs
+    $_SESSION['num_players'] = count($valid_players);
+    $_SESSION['players'] = array_column($valid_players, 'nombre');
+    $_SESSION['player_ids'] = array_column($valid_players, 'id');
 
     echo json_encode(["success" => true, "num_players" => $_SESSION['num_players']]);
 } else {

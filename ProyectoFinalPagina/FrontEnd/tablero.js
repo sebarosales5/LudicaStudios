@@ -426,6 +426,11 @@ document.addEventListener('DOMContentLoaded', () => {
           // Recalcular puntuaciones
           try { computeScoresForPlayer(playerId); } catch (err) { console.warn('Error al calcular puntuación del jugador', playerId, err); }
 
+          // Verificar si la partida ha terminado
+          if (checkGameEnd()) {
+            return; // No avanzar turno si la partida terminó
+          }
+
           // Pasar al siguiente jugador después de un pequeño retraso
           setTimeout(() => {
             nextTurn();
@@ -622,6 +627,9 @@ function distributeNewDinosaurs() {
   // Actualizar contador de dinosaurios restantes
   remainingDinosCount = sharedPool.length;
   updateRemainingDinosIndicator();
+
+  // Verificar si la partida ha terminado después de la distribución
+  setTimeout(() => checkGameEnd(), 500);
 
   // Mostrar mensaje de nueva distribución
   const toastContainer = document.createElement('div');
@@ -977,5 +985,132 @@ function updateDiceUI() {
       }
     }
   }
+}
+
+// Función para guardar la partida en la base de datos
+async function guardarPartida() {
+  try {
+    // Recopilar las puntuaciones finales de todos los jugadores
+    const jugadores = [];
+    for (let i = 0; i < NUM_PLAYERS; i++) {
+      const scores = computeScoresForPlayer(i);
+      jugadores.push({
+        id_usuario: PLAYER_IDS[i],
+        nombre: PLAYER_NAMES[i],
+        puntuacion: scores.total
+      });
+    }
+
+    console.log('Guardando partida con datos:', jugadores);
+
+    // Enviar datos al backend
+    const response = await fetch('../BackEnd/guardar_partida.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ jugadores })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log('Partida guardada con ID:', result.id_partida);
+      return { success: true, id_partida: result.id_partida };
+    } else {
+      throw new Error(result.message || 'Error al guardar la partida');
+    }
+  } catch (error) {
+    console.error('Error al guardar partida:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Función para detectar fin de juego y mostrar modal
+async function finalizarPartida() {
+  console.log('Finalizando partida...');
+  
+  // Calcular puntuaciones finales de todos los jugadores
+  const resultados = [];
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    const scores = computeScoresForPlayer(i);
+    resultados.push({
+      index: i,
+      nombre: PLAYER_NAMES[i],
+      puntuacion: scores.total
+    });
+  }
+  
+  // Ordenar por puntuación descendente
+  resultados.sort((a, b) => b.puntuacion - a.puntuacion);
+  
+  // Determinar ganador
+  const ganador = resultados[0];
+  
+  // Llenar el modal con los resultados
+  document.getElementById('ganador-nombre').textContent = ganador.nombre;
+  
+  const tablaResultados = document.getElementById('tabla-resultados');
+  tablaResultados.innerHTML = '';
+  
+  resultados.forEach((jugador, index) => {
+    const row = document.createElement('tr');
+    if (index === 0) {
+      row.className = 'table-success fw-bold';
+    }
+    
+    const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+    
+    row.innerHTML = `
+      <td>${medalla} ${index + 1}º</td>
+      <td>${jugador.nombre}</td>
+      <td>${jugador.puntuacion} puntos</td>
+    `;
+    
+    tablaResultados.appendChild(row);
+  });
+  
+  // Guardar automáticamente en la base de datos
+  const saveResult = await guardarPartida();
+  
+  if (!saveResult.success) {
+    // Si falla el guardado, mostrar advertencia en el modal
+    const alertDiv = document.querySelector('#modalFinPartida .alert-info');
+    if (alertDiv) {
+      alertDiv.className = 'alert alert-warning mt-3';
+      alertDiv.innerHTML = '<strong>⚠️ Advertencia:</strong> No se pudieron guardar los resultados automáticamente. ' + saveResult.error;
+    }
+  }
+  
+  // Mostrar el modal
+  const modal = new bootstrap.Modal(document.getElementById('modalFinPartida'));
+  modal.show();
+}
+
+// Función para verificar si la partida ha terminado
+function checkGameEnd() {
+  // La partida termina cuando no quedan dinosaurios en el pool
+  // Y todos los jugadores han colocado todos sus dinosaurios visibles
+  if (remainingDinosCount === 0) {
+    // Verificar que todos los jugadores hayan vaciado sus pools visibles
+    let allPoolsEmpty = true;
+    for (let i = 0; i < NUM_PLAYERS; i++) {
+      const visible = currentVisibleDinos.get(i) || [];
+      if (visible.length > 0) {
+        allPoolsEmpty = false;
+        break;
+      }
+    }
+    
+    if (allPoolsEmpty) {
+      console.log('¡Partida terminada! Pool vacío y todos los jugadores sin dinosaurios.');
+      // Pequeño delay para que se vean las últimas colocaciones
+      setTimeout(() => {
+        finalizarPartida();
+      }, 1000);
+      return true;
+    }
+  }
+  return false;
 }
 
