@@ -644,6 +644,55 @@ function calculateBosqueScore(zonaElem, playerId) {
   return 7;
 }
 
+// Calcula la puntuación de la zona Río (zona3)
+// Regla: 7 puntos si el jugador tiene mayor o igual cantidad de ese tipo de dinosaurio que todos los demás jugadores
+function calculateRioScore(zonaElem, playerId) {
+  if (!zonaElem) return 0;
+  const dino = zonaElem.querySelector('.dino');
+  if (!dino) return 0; // No hay dino en Río
+  const img = dino.querySelector('img');
+  const key = img ? img.alt : dino.dataset.type || 'unknown';
+  console.debug('[Río] Jugador', playerId, 'clave río=', key);
+
+  // Contar cuántos dinos de ese tipo tiene el jugador actual en TODO su tablero (zonas 1-7)
+  let myCount = 0;
+  for (let z = 1; z <= 7; z++) {
+    const zona = document.getElementById(`player${playerId}-zona${z}`);
+    if (!zona) continue;
+    const dinos = zona.querySelectorAll('.dino');
+    dinos.forEach(d => {
+      const i = d.querySelector('img');
+      const k = i ? i.alt : d.dataset.type || 'unknown';
+      if (k === key) myCount++;
+    });
+  }
+  console.debug('[Río] Jugador', playerId, 'tiene', myCount, 'de tipo', key);
+
+  // Revisar cuántos tiene cada otro jugador de ese tipo en su tablero
+  for (let p = 0; p < NUM_PLAYERS; p++) {
+    if (p === playerId) continue; // Saltar el jugador actual
+    let opponentCount = 0;
+    for (let z = 1; z <= 7; z++) {
+      const zona = document.getElementById(`player${p}-zona${z}`);
+      if (!zona) continue;
+      const dinos = zona.querySelectorAll('.dino');
+      dinos.forEach(d => {
+        const i = d.querySelector('img');
+        const k = i ? i.alt : d.dataset.type || 'unknown';
+        if (k === key) opponentCount++;
+      });
+    }
+    console.debug('[Río] Jugador', p, 'tiene', opponentCount, 'de tipo', key);
+    if (opponentCount > myCount) {
+      console.debug('[Río] Jugador', p, 'tiene más => sin puntos');
+      return 0; // Otro jugador tiene más
+    }
+  }
+  
+  console.debug('[Río] Jugador', playerId, 'tiene mayor o igual cantidad => +7');
+  return 7;
+}
+
 // Calcula la puntuación de la zona Pradera (zona1)
 function calculatePraderaScore(zonaElem) {
   if (!zonaElem) return 0;
@@ -687,6 +736,10 @@ function computeScoresForPlayer(playerId) {
   const zona2 = document.getElementById(`player${playerId}-zona2`);
   scores.bosque = calculateBosqueScore(zona2, playerId);
 
+  // Zona 3: Río
+  const zona3 = document.getElementById(`player${playerId}-zona3`);
+  scores.rio = calculateRioScore(zona3, playerId);
+
   // Zona 4: Montaña
   const zona4 = document.getElementById(`player${playerId}-zona4`);
   scores.montana = calculateMontanaScore(zona4);
@@ -721,6 +774,10 @@ function computeScoresForPlayer(playerId) {
   // Si tienes un campo específico para el puntaje de bosque, actualízalo aquí
   const bosqueEl = document.getElementById(`player${playerId}-puntuacion-bosque`);
   if (bosqueEl) bosqueEl.textContent = scores.bosque;
+
+  // Si tienes un campo específico para el puntaje de río, actualízalo aquí
+  const rioEl = document.getElementById(`player${playerId}-puntuacion-rio`);
+  if (rioEl) rioEl.textContent = scores.rio;
 
   // Si tienes un campo específico para el puntaje de desierto, actualízalo aquí
   const desiertoEl = document.getElementById(`player${playerId}-puntuacion-desierto`);
