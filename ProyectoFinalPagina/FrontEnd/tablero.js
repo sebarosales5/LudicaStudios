@@ -4,8 +4,12 @@
 let currentTurn = 1; // Comenzamos en turno 1
 let activePlayerIndex = 0;
 let sharedPool = []; // Pool compartido de dinosaurios
+let placementsThisRound = new Set(); // Conjunto para rastrear jugadores que han colocado en esta ronda
+let roundNumber = 1; // Número de ronda actual
 let currentVisibleDinos = new Map(); // Dinosaurios visibles por jugador
 let remainingDinosCount = 0; // Contador de dinosaurios restantes en el pool
+let totalPlacements = new Map(); // Total de colocaciones por jugador
+const DINOS_PER_DISTRIBUTION = 6; // Número de dinosaurios a repartir en cada distribución
 
 // Lista de tipos y rutas de imagen
 const DINO_TYPES = [
@@ -92,6 +96,12 @@ function initializeSharedPool() {
   shuffle(sharedPool);
   remainingDinosCount = sharedPool.length;
   console.log('Pool inicial creado. Total dinosaurios:', remainingDinosCount);
+  
+  // Inicializar contadores de colocación para cada jugador
+  totalPlacements = new Map();
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    totalPlacements.set(i, 0);
+  }
   
   updateRemainingDinosIndicator();
 }
@@ -187,8 +197,22 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('Dragover en zona del jugador', playerId);
           
           if (activePlayerIndex === playerId) {
-            e.dataTransfer.dropEffect = 'move';
-            zona.classList.add('zona-valida');
+            // Verificar si la zona permite más dinosaurios
+            const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
+            const currentCount = zona.querySelectorAll('.dino').length;
+            const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6; // Pradera capacidad 6
+
+            const invalidBecauseSingle = isSingleOccupancy && currentCount > 0;
+            const invalidBecausePradera = isPraderaFull;
+
+            if (invalidBecauseSingle || invalidBecausePradera) {
+              e.dataTransfer.dropEffect = 'none';
+              zona.classList.add('zona-invalida');
+              console.log('Zona no permite más dinos o ya ocupada:', zona.id, 'count=', currentCount);
+            } else {
+              e.dataTransfer.dropEffect = 'move';
+              zona.classList.add('zona-valida');
+            }
           } else {
             e.dataTransfer.dropEffect = 'none';
           }
@@ -200,12 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('Dragenter en zona del jugador', playerId);
           
           if (activePlayerIndex === playerId) {
-            zona.classList.add('zona-valida');
+            const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
+            const currentCount = zona.querySelectorAll('.dino').length;
+            const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6;
+
+            if ((isSingleOccupancy && currentCount > 0) || isPraderaFull) {
+              zona.classList.add('zona-invalida');
+            } else {
+              zona.classList.add('zona-valida');
+            }
           }
         });
 
         zona.addEventListener('dragleave', () => {
           zona.classList.remove('zona-valida');
+          zona.classList.remove('zona-invalida');
         });
 
         zona.addEventListener('drop', e => {
@@ -214,6 +247,16 @@ document.addEventListener('DOMContentLoaded', () => {
           
           if (activePlayerIndex !== playerId) {
             console.log('Drop cancelado - no es el turno del jugador');
+            return;
+          }
+
+          // Verificar si la zona está restringida y ya tiene un dinosaurio o si Pradera está llena
+          const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3');
+          const currentCount = zona.querySelectorAll('.dino').length;
+          const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6;
+
+          if ((isSingleOccupancy && currentCount > 0) || isPraderaFull) {
+            console.log('Drop cancelado - zona restringida o llena:', zona.id, 'count=', currentCount);
             return;
           }
           
@@ -297,6 +340,44 @@ document.addEventListener('DOMContentLoaded', () => {
           if (dinoIndex !== -1) {
             playerDinos.splice(dinoIndex, 1);
             currentVisibleDinos.set(playerId, playerDinos);
+
+            // Incrementar contador de colocaciones del jugador
+            const currentPlacements = totalPlacements.get(playerId) || 0;
+            totalPlacements.set(playerId, currentPlacements + 1);
+
+            // Registrar que este jugador ha colocado en esta ronda
+            placementsThisRound.add(playerId);
+            console.log(`Jugador ${playerId} colocó. Colocaciones en esta ronda:`, placementsThisRound.size);
+            console.log(`Total de colocaciones del jugador ${playerId}:`, currentPlacements + 1);
+
+            // Comprobar si todos los jugadores han colocado en esta ronda
+            if (placementsThisRound.size === NUM_PLAYERS) {
+              console.log('Todos los jugadores han colocado. Rotando dinosaurios...');
+              rotateDinosaurs();
+              placementsThisRound.clear(); // Reiniciar para la siguiente ronda
+              roundNumber++;
+
+              // Comprobar si todos los jugadores han colocado sus 6 dinosaurios
+              let allPlayersFinished = true;
+              for (let i = 0; i < NUM_PLAYERS; i++) {
+                if ((totalPlacements.get(i) || 0) < DINOS_PER_DISTRIBUTION) {
+                  allPlayersFinished = false;
+                  break;
+                }
+              }
+
+              // Si todos completaron sus 6 dinosaurios y quedan dinosaurios en el pool, repartir nuevos
+              if (allPlayersFinished && sharedPool.length > 0) {
+                distributeNewDinosaurs();
+              }
+            }
+          }
+
+          // Recalcular puntuaciones para el jugador que acaba de colocar
+          try {
+            computeScoresForPlayer(playerId);
+          } catch (err) {
+            console.warn('Error al calcular puntuación del jugador', playerId, err);
           }
 
           // Pasar automáticamente al siguiente jugador después de colocar
@@ -359,3 +440,167 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Error al inicializar el juego:', e);
   }
 });
+
+// Función para distribuir nuevos dinosaurios a todos los jugadores
+function distributeNewDinosaurs() {
+  console.log('Distribuyendo nueva ronda de dinosaurios...');
+  
+  // Reiniciar contadores de colocación
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    totalPlacements.set(i, 0);
+  }
+
+  // Distribuir nuevos dinosaurios a cada jugador
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    const newDinos = sharedPool.splice(0, Math.min(DINOS_PER_DISTRIBUTION, sharedPool.length));
+    if (newDinos.length > 0) {
+      currentVisibleDinos.set(i, newDinos);
+      generatePoolAndRenderForPlayer(i, newDinos.length);
+    }
+  }
+
+  // Actualizar contador de dinosaurios restantes
+  remainingDinosCount = sharedPool.length;
+  updateRemainingDinosIndicator();
+
+  // Mostrar mensaje de nueva distribución
+  const toastContainer = document.createElement('div');
+  toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+  toastContainer.style.zIndex = '11';
+  
+  const toastElement = document.createElement('div');
+  toastElement.className = 'toast align-items-center text-white bg-primary';
+  toastElement.setAttribute('role', 'alert');
+  toastElement.setAttribute('aria-live', 'assertive');
+  toastElement.setAttribute('aria-atomic', 'true');
+  
+  const remainingMsg = sharedPool.length > 0 ? 
+    `Quedan ${sharedPool.length} dinosaurios en el pool.` : 
+    '¡Esta es la última ronda!';
+  
+  toastElement.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">
+        ¡Nueva ronda! Se han distribuido nuevos dinosaurios. ${remainingMsg}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  `;
+  
+  toastContainer.appendChild(toastElement);
+  document.body.appendChild(toastContainer);
+  
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+  
+  setTimeout(() => {
+    toastContainer.remove();
+  }, 5000);
+}
+
+// Función para rotar los dinosaurios entre jugadores
+function rotateDinosaurs() {
+  console.log('Iniciando rotación de dinosaurios');
+  const tempDinos = new Map();
+
+  // Guardar los dinosaurios actuales en un mapa temporal
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    tempDinos.set(i, currentVisibleDinos.get(i) || []);
+  }
+
+  // Rotar los dinosaurios: cada jugador recibe los dinos del siguiente jugador
+  // (el último jugador recibe los del primero)
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    const sourcePlayer = (i + 1) % NUM_PLAYERS; // El jugador del que tomaremos los dinos
+    const targetPlayer = i; // El jugador que recibirá los dinos
+    const dinosToPass = tempDinos.get(sourcePlayer);
+    
+    console.log(`Pasando ${dinosToPass.length} dinos del jugador ${sourcePlayer} al jugador ${targetPlayer}`);
+    currentVisibleDinos.set(targetPlayer, dinosToPass);
+    
+    // Regenerar el pool visual para el jugador que recibe
+    generatePoolAndRenderForPlayer(targetPlayer, dinosToPass.length);
+  }
+
+  // Mostrar mensaje de rotación
+  const toastContainer = document.createElement('div');
+  toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+  toastContainer.style.zIndex = '11';
+  
+  const toastElement = document.createElement('div');
+  toastElement.className = 'toast align-items-center text-white bg-success';
+  toastElement.setAttribute('role', 'alert');
+  toastElement.setAttribute('aria-live', 'assertive');
+  toastElement.setAttribute('aria-atomic', 'true');
+  
+  toastElement.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">
+        ¡Ronda ${roundNumber} completada! Los dinosaurios han rotado.
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  `;
+  
+  toastContainer.appendChild(toastElement);
+  document.body.appendChild(toastContainer);
+  
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+  
+  setTimeout(() => {
+    toastContainer.remove();
+  }, 5000);
+}
+
+// ---------------------- Puntuación por zonas ----------------------
+// Calcula la puntuación de la zona Pradera (zona1)
+function calculatePraderaScore(zonaElem) {
+  if (!zonaElem) return 0;
+  // Contar tipos por clave (se asume que el elemento .dino img.alt contiene la key)
+  const dinos = zonaElem.querySelectorAll('.dino');
+  const counts = {};
+  dinos.forEach(d => {
+    const img = d.querySelector('img');
+    const key = img ? img.alt : d.dataset.type || 'unknown';
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  // Si no hay dinosaurios
+  if (Object.keys(counts).length === 0) return 0;
+
+  // Obtener el mayor grupo
+  let maxCount = 0;
+  Object.values(counts).forEach(c => { if (c > maxCount) maxCount = c; });
+
+  // Tabla de puntos
+  const scoreTable = {
+    1: 2,
+    2: 4,
+    3: 8,
+    4: 12,
+    5: 18,
+    6: 24
+  };
+
+  return scoreTable[maxCount] || 0;
+}
+
+// Calcular puntuaciones por zonas para un jugador y actualizar el DOM
+function computeScoresForPlayer(playerId) {
+  const scores = {};
+  // Zona 1: Pradera
+  const zona1 = document.getElementById(`player${playerId}-zona1`);
+  scores.pradera = calculatePraderaScore(zona1);
+
+  // (Otras zonas se implementarán más adelante)
+  scores.total = Object.values(scores).reduce((s, v) => s + (v || 0), 0);
+
+  // Actualizar la interfaz
+  const scoreEl = document.getElementById(`player${playerId}-puntuacion`);
+  if (scoreEl) scoreEl.textContent = scores.total;
+
+  console.log(`Puntuaciones jugador ${playerId}:`, scores);
+  return scores;
+}
+

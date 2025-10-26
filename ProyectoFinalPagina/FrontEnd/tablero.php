@@ -57,13 +57,27 @@
               <div class="d-flex justify-content-center mb-3 p-3">
                 <div class="mapa" data-player-id="<?php echo $index; ?>">
                   <img src="../Otros/fotos/Tablero_final.jpg" alt="Mapa zoológico de <?php echo htmlspecialchars($player); ?>" class="img-fluid">
-                  <div class="zona" id="player<?php echo $index; ?>-zona1"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona2"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona3"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona4"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona5"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona6"></div>
-                  <div class="zona" id="player<?php echo $index; ?>-zona7"></div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona1">
+                    <div class="zona-label">Pradera</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona2">
+                    <div class="zona-label">Bosque</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona3">
+                    <div class="zona-label">Río</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona4">
+                    <div class="zona-label">Montaña</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona5">
+                    <div class="zona-label">Desierto</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona6">
+                    <div class="zona-label">Costa</div>
+                  </div>
+                  <div class="zona" id="player<?php echo $index; ?>-zona7">
+                    <div class="zona-label">Lago</div>
+                  </div>
                 </div>
               </div>
 
@@ -76,7 +90,7 @@
             <!-- Columna derecha: dos cajas apiladas -->
             <div class="col-md-4">
               <!-- Caja superior: controles -->
-              <div class="card mb-3 position-static" style="top:1rem;">
+              <div class="card mb-3 position-static" style="top:2rem;">
                 <div class="card-header" style="background-color: #105c16bd; color: white;">
                   Controles - <?php echo htmlspecialchars($player); ?>
                 </div>
@@ -126,7 +140,7 @@
           <div class="col-md-4 text-center">
             <div class="card bg-success text-white">
               <div class="card-body p-2">
-                <h6 class="card-title mb-1">Dinosaurios en el mazo</h6>
+                <h6 class="card-title mb-1">Dinosaurios en la bolsa</h6>
                 <p class="display-6 mb-0" id="remaining-dinos-count">0</p>
               </div>
             </div>
@@ -178,12 +192,32 @@
           background-color: rgba(255, 153, 0, 0.1);
         }
         
-        /* Feedback visual para zonas válidas */
+        /* Feedback visual para zonas válidas e inválidas */
         .zona {
           transition: all 0.3s ease;
         }
         .zona-valida {
           transform: scale(1.02);
+          background-color: rgba(25, 135, 84, 0.2) !important;
+        }
+        .zona-invalida {
+          background-color: rgba(220, 53, 69, 0.2) !important;
+          cursor: not-allowed;
+        }
+
+        /* Etiquetas de zona */
+        .zona-label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          background-color: rgba(16, 92, 22, 0.9);
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          pointer-events: none;
+          z-index: 10;
+          font-family: 'Poppins', sans-serif;
         }
 
         /* Mejorar visualización de dinosaurios */
