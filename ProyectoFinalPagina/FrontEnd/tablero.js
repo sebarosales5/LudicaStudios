@@ -10,6 +10,10 @@ let currentVisibleDinos = new Map(); // Dinosaurios visibles por jugador
 let remainingDinosCount = 0; // Contador de dinosaurios restantes en el pool
 let totalPlacements = new Map(); // Total de colocaciones por jugador
 const DINOS_PER_DISTRIBUTION = 6; // Número de dinosaurios a repartir en cada distribución
+// Estado del dado por turno
+let activeDice = null; // { face: 1-6, name: string, description: string }
+let diceRolled = false;
+let dieHolderIndex = 0; // Jugador que debe tirar el dado al inicio de cada ronda
 
 // Lista de tipos y rutas de imagen
 const DINO_TYPES = [
@@ -45,6 +49,12 @@ function updateGameState() {
   document.getElementById('turno-num').textContent = currentTurn;
   document.getElementById('jugador-activo').textContent = PLAYER_NAMES[activePlayerIndex];
   
+  // Actualizar poseedor del dado en estado global
+  const dadoHolderEl = document.getElementById('dado-holder');
+  if (dadoHolderEl) {
+    dadoHolderEl.textContent = PLAYER_NAMES[dieHolderIndex];
+  }
+  
   // Actualizar indicador visual del turno actual
   for (let i = 0; i < NUM_PLAYERS; i++) {
     const tab = document.querySelector(`#player${i}-tab`);
@@ -63,6 +73,9 @@ function updateGameState() {
       }
     }
   }
+
+  // Actualizar estado de los botones del dado según el poseedor del dado
+  setDiceButtonsState();
 }
 
 // Manejar cambio de turno
@@ -149,6 +162,12 @@ function generatePoolAndRenderForPlayer(playerId, visibleCount = 6) {
         e.preventDefault();
         return;
       }
+      // Requiere tirar el dado antes de arrastrar
+      if (!diceRolled) {
+        console.log('Drag bloqueado - primero hay que tirar el dado');
+        e.preventDefault();
+        return;
+      }
       e.dataTransfer.setData('text/plain', wrapper.id);
       wrapper.classList.add('dragging');
       console.log('Drag iniciado, ID:', wrapper.id);
@@ -179,6 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM cargado, iniciando juego');
   try {
     console.log('Comprobando variables globales:', { NUM_PLAYERS, PLAYER_NAMES });
+    // Inyectar estilos para resaltar zonas habilitadas/inhabilitadas por el dado
+    injectDiceStylesOnce();
+  // El dado inicia en el jugador 1 (índice 0)
+  dieHolderIndex = 0;
     
     // Inicializar el pool compartido
     initializeSharedPool();
@@ -199,6 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('Dragover en zona del jugador', playerId);
           
           if (activePlayerIndex === playerId) {
+            // Restringir por dado: si no se tiró o la zona no está habilitada, bloquear
+            if (!diceRolled || !checkDiceAllowsZone(playerId, zona)) {
+              e.dataTransfer.dropEffect = 'none';
+              zona.classList.add('zona-invalida');
+              return;
+            }
             // Verificar si la zona permite más dinosaurios
             const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
             const currentCount = zona.querySelectorAll('.dino').length;
@@ -230,6 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('Dragenter en zona del jugador', playerId);
           
           if (activePlayerIndex === playerId) {
+            if (!diceRolled || !checkDiceAllowsZone(playerId, zona)) {
+              zona.classList.add('zona-invalida');
+              return;
+            }
             const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
             const currentCount = zona.querySelectorAll('.dino').length;
             const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6;
@@ -255,6 +288,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (activePlayerIndex !== playerId) {
             console.log('Drop cancelado - no es el turno del jugador');
+            return;
+          }
+
+          // Restringir por dado
+          if (!diceRolled || !checkDiceAllowsZone(playerId, zona)) {
+            console.log('Drop cancelado - la zona no está habilitada por el dado');
             return;
           }
 
@@ -365,6 +404,18 @@ document.addEventListener('DOMContentLoaded', () => {
             placementsThisRound.clear();
             roundNumber++;
 
+            // Pasar el dado al jugador anterior y reiniciar estado del dado
+            dieHolderIndex = (dieHolderIndex - 1 + NUM_PLAYERS) % NUM_PLAYERS;
+            activeDice = null;
+            diceRolled = false;
+            clearDiceRestrictions();
+            setDiceButtonsState();
+            // Avisar a quién le toca tirar el dado
+            try {
+              const metaInfo = { name: 'Nueva ronda', description: `Le toca tirar el dado a ${PLAYER_NAMES[dieHolderIndex]}` };
+              showDiceToast(dieHolderIndex, '-', metaInfo);
+            } catch (e) { /* noop */ }
+
             let allPlayersFinished = true;
             for (let i = 0; i < NUM_PLAYERS; i++) {
               if ((totalPlacements.get(i) || 0) < DINOS_PER_DISTRIBUTION) { allPlayersFinished = false; break; }
@@ -393,33 +444,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Configurar botones específicos de cada jugador
     for (let i = 0; i < NUM_PLAYERS; i++) {
-      const btnStart = document.getElementById(`player${i}-btn-start`);
-      const btnEnd = document.getElementById(`player${i}-btn-end`);
-      const btnReset = document.getElementById(`player${i}-btn-reset`);
+      const btnDado = document.getElementById(`player${i}-btn-dado`);
 
-      if (btnStart) {
-        btnStart.addEventListener('click', () => {
-          if (activePlayerIndex === i) {
-            generatePoolAndRenderForPlayer(i);
-          }
-        });
-      }
-
-      if (btnEnd) {
-        btnEnd.addEventListener('click', () => {
-          if (activePlayerIndex === i) {
-            nextTurn();
-          }
-        });
-      }
-                    computeScoresForPlayer(playerId);
-      if (btnReset) {
-        btnReset.addEventListener('click', () => {
-          if (confirm(`¿Seguro que quieres reiniciar el tablero de ${PLAYER_NAMES[i]}?`)) {
-            const zonas = document.querySelectorAll(`[id^="player${i}-zona"]`);
-            zonas.forEach(zona => zona.innerHTML = '');
-            generatePoolAndRenderForPlayer(i);
-            updatePlayerStats(i);
+      if (btnDado) {
+        btnDado.addEventListener('click', () => {
+          // Solo el poseedor del dado puede tirar y solo si aún no se tiró para esta ronda
+          if (dieHolderIndex === i) {
+            if (diceRolled) return;
+            const face = rollDice();
+            const meta = getDiceFaceMeta(face);
+            activeDice = { face, name: meta.name, description: meta.description };
+            diceRolled = true;
+            setDiceButtonsState();
+            // Resaltar zonas habilitadas para todos los jugadores esta ronda
+            highlightZonesForDiceAllPlayers();
+            // Mostrar toast informativo
+            showDiceToast(i, face, meta);
+            console.log(`Jugador ${i} (${PLAYER_NAMES[i]}) tiró el dado: ${face} - ${meta.name}`);
+          } else {
+            // No es su turno
+            console.log('Intento de tirar dado fuera de turno');
           }
         });
       }
@@ -432,6 +476,130 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Error al inicializar el juego:', e);
   }
 });
+
+// ---------- Utilidades del Dado y UI ----------
+function injectDiceStylesOnce() {
+  if (document.getElementById('dice-style-marker')) return;
+  const style = document.createElement('style');
+  style.id = 'dice-style-marker';
+  style.textContent = `
+    .zona-dado-enabled { outline: 2px dashed #0d6efd; outline-offset: -2px; }
+    .zona-dado-disabled { filter: grayscale(0.5); opacity: 0.6; }
+    .dice-holder-badge { display:inline-block; }
+  `;
+  document.head.appendChild(style);
+}
+
+function rollDice() {
+  return Math.floor(Math.random() * 6) + 1;
+}
+
+function getDiceFaceMeta(face) {
+  switch (face) {
+    case 1: return { name: 'Bosque', description: 'Habilitadas: Lago (7), Montaña (4), Río (3), Pradera (1)', zones: [7,4,3,1] };
+    case 2: return { name: 'Llanura', description: 'Habilitadas: Lago (7), Bosque (2), Desierto (5), Costa (6)', zones: [7,2,5,6] };
+    case 3: return { name: 'Baños', description: 'Habilitadas: Lago (7), Bosque (2), Río (3), Costa (6)', zones: [7,2,3,6] };
+    case 4: return { name: 'Cafetería', description: 'Habilitadas: Lago (7), Montaña (4), Desierto (5), Pradera (1)', zones: [7,4,5,1] };
+    case 5: return { name: 'Recinto vacío', description: 'Sólo zonas vacías (sin dinosaurios)', zones: null };
+    case 6: return { name: '¡Cuidado con el T-Rex!', description: 'Sólo zonas que NO tengan un T-Rex. Podés jugar T-Rex si en esa zona no hay uno.', zones: null };
+    default: return { name: 'Desconocido', description: '', zones: null };
+  }
+}
+
+function parseZoneNumberFromId(id) {
+  const parts = id.split('-zona');
+  if (parts.length < 2) return NaN;
+  return parseInt(parts[1], 10);
+}
+
+function hasTrexInZone(zonaElem) {
+  return !!zonaElem.querySelector('img[alt="trex"]');
+}
+
+function isZoneEmpty(zonaElem) {
+  return zonaElem.querySelectorAll('.dino').length === 0;
+}
+
+function checkDiceAllowsZone(playerId, zonaElem) {
+  // Sólo chequea zonas del jugador activo
+  if (!diceRolled || !activeDice) return false;
+  const face = activeDice.face;
+  const num = parseZoneNumberFromId(zonaElem.id);
+  const meta = getDiceFaceMeta(face);
+  if (face >= 1 && face <= 4) {
+    return meta.zones.includes(num);
+  }
+  if (face === 5) {
+    return isZoneEmpty(zonaElem);
+  }
+  if (face === 6) {
+    return !hasTrexInZone(zonaElem);
+  }
+  return true;
+}
+
+function highlightZonesForDiceAllPlayers() {
+  clearDiceRestrictions();
+  if (!activeDice) return;
+  for (let p = 0; p < NUM_PLAYERS; p++) {
+    const zonas = document.querySelectorAll(`[id^="player${p}-zona"]`);
+    zonas.forEach(z => {
+      if (checkDiceAllowsZone(p, z)) {
+        z.classList.add('zona-dado-enabled');
+      } else {
+        z.classList.add('zona-dado-disabled');
+      }
+    });
+  }
+}
+
+function clearDiceRestrictions() {
+  // Remover clases visuales en todos los tableros
+  for (let p = 0; p < NUM_PLAYERS; p++) {
+    const zonas = document.querySelectorAll(`[id^="player${p}-zona"]`);
+    zonas.forEach(z => {
+      z.classList.remove('zona-dado-enabled');
+      z.classList.remove('zona-dado-disabled');
+      z.classList.remove('zona-valida');
+      z.classList.remove('zona-invalida');
+    });
+  }
+}
+
+function showDiceToast(playerId, face, meta) {
+  const toastContainer = document.createElement('div');
+  toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+  toastContainer.style.zIndex = '11';
+  const toastElement = document.createElement('div');
+  toastElement.className = 'toast align-items-center text-white bg-dark';
+  toastElement.setAttribute('role', 'alert');
+  toastElement.setAttribute('aria-live', 'assertive');
+  toastElement.setAttribute('aria-atomic', 'true');
+  toastElement.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">
+        ${typeof face === 'number' ? `${PLAYER_NAMES[playerId]} tiró el dado: <strong>${face} - ${meta.name}</strong>` : meta.name}<br/>
+        ${meta.description || ''}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  `;
+  toastContainer.appendChild(toastElement);
+  document.body.appendChild(toastContainer);
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+  setTimeout(() => toastContainer.remove(), 5000);
+}
+
+function setDiceButtonsState() {
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    const btn = document.getElementById(`player${i}-btn-dado`);
+    if (!btn) continue;
+    // Solo el poseedor del dado puede tirar; tras tirar, se desactiva hasta que termine la ronda
+    btn.disabled = !(i === dieHolderIndex && !diceRolled);
+  }
+  updateDiceUI();
+}
 
 // Función para distribuir nuevos dinosaurios a todos los jugadores
 function distributeNewDinosaurs() {
@@ -789,5 +957,25 @@ function computeScoresForPlayer(playerId) {
 
   console.log(`Puntuaciones jugador ${playerId}:`, scores);
   return scores;
+}
+
+// Actualiza indicadores de poseedor del dado y etiqueta de cara del dado
+function updateDiceUI() {
+  for (let i = 0; i < NUM_PLAYERS; i++) {
+    const holderEl = document.getElementById(`player${i}-dice-holder-indicator`);
+    const faceEl = document.getElementById(`player${i}-dice-face-label`);
+    if (holderEl) {
+      holderEl.style.display = (i === dieHolderIndex) ? '' : 'none';
+    }
+    if (faceEl) {
+      if (diceRolled && activeDice) {
+        faceEl.textContent = `Restricción: ${activeDice.name}`;
+      } else if (i === dieHolderIndex) {
+        faceEl.textContent = 'Listo para tirar el dado';
+      } else {
+        faceEl.textContent = '';
+      }
+    }
+  }
 }
 

@@ -96,10 +96,12 @@
                 </div>
                 <div class="card-body" style="background-color: #fff8e1;">
                   <p class="card-text">Botones para controlar la partida.</p>
+                  <div id="player<?php echo $index; ?>-dice-holder-indicator" class="mb-2" style="display:none;">
+                    <span class="badge bg-warning text-dark">Posee el dado</span>
+                  </div>
+                  <div id="player<?php echo $index; ?>-dice-face-label" class="small text-muted mb-2"></div>
                   <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary" id="player<?php echo $index; ?>-btn-start">Iniciar turno</button>
-                    <button type="button" class="btn btn-warning" id="player<?php echo $index; ?>-btn-end">Terminar turno</button>
-                    <button type="button" class="btn btn-danger" id="player<?php echo $index; ?>-btn-reset">Reiniciar</button>
+                    <button type="button" class="btn btn-primary" id="player<?php echo $index; ?>-btn-dado">Tirar dado</button>
                   </div>
                 </div>
               </div>
@@ -136,6 +138,7 @@
           <div class="col-md-4">
             <p class="mb-1">Turno actual: <span id="turno-num">1</span></p>
             <p class="mb-1">Jugador activo: <strong id="jugador-activo"><?php echo htmlspecialchars($players[0]); ?></strong></p>
+            <p class="mb-1">Poseedor del dado: <strong id="dado-holder"><?php echo htmlspecialchars($players[0]); ?></strong></p>
           </div>
           <div class="col-md-4 text-center">
             <div class="card bg-success text-white">
