@@ -170,6 +170,8 @@ function updatePlayerStats(playerId) {
 
   const dinosPlaced = playerBoard.querySelectorAll('.zona .dino').length;
   document.getElementById(`player${playerId}-dinos-count`).textContent = dinosPlaced;
+  // Recalcular puntuaciones para mantener la UI consistente
+  try { computeScoresForPlayer(playerId); } catch (e) { console.warn('computeScoresForPlayer falló en updatePlayerStats', e); }
 }
 
 // Inicialización al cargar la página
@@ -201,11 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
             const currentCount = zona.querySelectorAll('.dino').length;
             const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6; // Pradera capacidad 6
+            const isMontanaFull = zona.id.endsWith('-zona4') && currentCount >= 3; // Montaña capacidad 3
+            const isCostaFull = zona.id.endsWith('-zona6') && currentCount >= 6; // Costa capacidad 6
 
             const invalidBecauseSingle = isSingleOccupancy && currentCount > 0;
             const invalidBecausePradera = isPraderaFull;
+            const invalidBecauseMontana = isMontanaFull;
+            const invalidBecauseCosta = isCostaFull;
 
-            if (invalidBecauseSingle || invalidBecausePradera) {
+            if (invalidBecauseSingle || invalidBecausePradera || invalidBecauseMontana || invalidBecauseCosta) {
               e.dataTransfer.dropEffect = 'none';
               zona.classList.add('zona-invalida');
               console.log('Zona no permite más dinos o ya ocupada:', zona.id, 'count=', currentCount);
@@ -227,8 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3'); // Bosque o Río
             const currentCount = zona.querySelectorAll('.dino').length;
             const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6;
+            const isMontanaFull = zona.id.endsWith('-zona4') && currentCount >= 3; // Montaña capacidad 3
+            const isCostaFull = zona.id.endsWith('-zona6') && currentCount >= 6; // Costa capacidad 6
 
-            if ((isSingleOccupancy && currentCount > 0) || isPraderaFull) {
+            if ((isSingleOccupancy && currentCount > 0) || isPraderaFull || isMontanaFull || isCostaFull) {
               zona.classList.add('zona-invalida');
             } else {
               zona.classList.add('zona-valida');
@@ -244,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zona.addEventListener('drop', e => {
           e.preventDefault();
           console.log('Intento de drop en zona del jugador', playerId);
-          
+
           if (activePlayerIndex !== playerId) {
             console.log('Drop cancelado - no es el turno del jugador');
             return;
@@ -254,12 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const isSingleOccupancy = zona.id.endsWith('-zona2') || zona.id.endsWith('-zona3');
           const currentCount = zona.querySelectorAll('.dino').length;
           const isPraderaFull = zona.id.endsWith('-zona1') && currentCount >= 6;
+          const isMontanaFull = zona.id.endsWith('-zona4') && currentCount >= 3; // Montaña capacidad 3
+          const isCostaFull = zona.id.endsWith('-zona6') && currentCount >= 6; // Costa capacidad 6
 
-          if ((isSingleOccupancy && currentCount > 0) || isPraderaFull) {
+          if ((isSingleOccupancy && currentCount > 0) || isPraderaFull || isMontanaFull || isCostaFull) {
             console.log('Drop cancelado - zona restringida o llena:', zona.id, 'count=', currentCount);
             return;
           }
-          
+
           const dinoId = e.dataTransfer.getData('text/plain');
           console.log('Drop aceptado, dinosaurio:', dinoId);
           const dino = document.getElementById(dinoId);
@@ -268,126 +278,108 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          // Colocar el dinosaurio
-          zona.appendChild(dino);
-          zona.classList.remove('zona-valida');
+          // Intentar parsear player e index desde el id: formato esperado player{playerId}-{key}-{idx}
+          const idParts = dinoId.split('-');
+          const parsedPlayer = parseInt(idParts[0].replace('player', ''), 10);
+          const parsedIdx = parseInt(idParts[idParts.length - 1], 10);
+          const playerDinos = currentVisibleDinos.get(parsedPlayer) || [];
 
-          // Una vez colocado, el dinosaurio ya no debe poder moverse: quitar draggable y ajustar estilo
-          try {
-            // Evitar que el elemento o cualquiera de sus hijos (ej. <img>) sean arrastrables
-            dino.setAttribute('draggable', 'false');
-            dino.classList.add('placed');
-            dino.classList.remove('dragging');
-            dino.style.cursor = 'default';
+          // Clonar el dinosaurio para la zona (el original permanece en el pool hasta que lo removamos de la estructura de datos)
+          const clone = dino.cloneNode(true);
+          clone.id = `${dinoId}-placed-${Date.now()}`;
+          clone.setAttribute('draggable', 'false');
+          clone.classList.add('placed');
+          clone.classList.remove('dragging');
+          clone.style.cursor = 'default';
+          // Marcar imágenes internas como no arrastrables
+          const cloneImgs = clone.querySelectorAll('img');
+          cloneImgs.forEach(img => img.setAttribute('draggable', 'false'));
+          // Bloquear futuros dragstart
+          const blockDrag = ev => { ev.preventDefault(); ev.stopPropagation(); return false; };
+          clone.addEventListener('dragstart', blockDrag);
+          cloneImgs.forEach(img => img.addEventListener('dragstart', blockDrag));
 
-            // Marcar imágenes internas como no arrastrables (por defecto las <img> lo son)
-            const imgs = dino.querySelectorAll('img');
-            imgs.forEach(img => img.setAttribute('draggable', 'false'));
-
-            // Añadir un listener defensivo para bloquear cualquier dragstart futuro
-            const blockDrag = e => {
-              e.preventDefault();
-              e.stopPropagation();
-              return false;
-            };
-            dino.addEventListener('dragstart', blockDrag);
-            imgs.forEach(img => img.addEventListener('dragstart', blockDrag));
-          } catch (err) {
-            console.warn('No se pudo marcar el dino como colocado:', err);
-          }
-
+          // Posicionar y añadir a la zona
           if (zona.dataset.autoPosition === 'true') {
-            if (getComputedStyle(zona).position === 'static') {
-              zona.style.position = 'relative';
-            }
-
+            if (getComputedStyle(zona).position === 'static') zona.style.position = 'relative';
+            zona.appendChild(clone);
             const hijos = zona.querySelectorAll('.dino');
-            const index = Array.from(hijos).indexOf(dino);
+            const index = Array.from(hijos).indexOf(clone);
             const cols = parseInt(zona.dataset.cols) || 3;
             const gap = parseInt(zona.dataset.gap) || 110;
-
             const offsetX = (index % cols) * gap;
             const offsetY = Math.floor(index / cols) * gap;
-
-            dino.style.position = 'absolute';
-            dino.style.top = offsetY + 'px';
-            dino.style.left = offsetX + 'px';
+            clone.style.position = 'absolute';
+            clone.style.top = offsetY + 'px';
+            clone.style.left = offsetX + 'px';
           } else {
-            if (getComputedStyle(zona).position === 'static') {
-              zona.style.position = 'relative';
-            }
-
-            const rect = zona.getBoundingClientRect();
-            const dinoWidth = dino.offsetWidth || dino.getBoundingClientRect().width;
-            const dinoHeight = dino.offsetHeight || dino.getBoundingClientRect().height;
-            let x = e.clientX - rect.left - dinoWidth / 2;
-            let y = e.clientY - rect.top - dinoHeight / 2;
-
+            if (getComputedStyle(zona).position === 'static') zona.style.position = 'relative';
+            zona.appendChild(clone);
+            // Mejorar cálculo para que el dino quede dentro de la zona
+            const zonaRect = zona.getBoundingClientRect();
+            const dinoRect = clone.getBoundingClientRect();
+            const dinoWidth = dinoRect.width;
+            const dinoHeight = dinoRect.height;
+            // Calcular posición relativa al contenedor
+            let x = e.clientX - zonaRect.left - dinoWidth / 2;
+            let y = e.clientY - zonaRect.top - dinoHeight / 2;
+            // Ajustar para que no se salga por ningún borde
             x = Math.max(0, Math.min(x, zona.clientWidth - dinoWidth));
             y = Math.max(0, Math.min(y, zona.clientHeight - dinoHeight));
-
-            dino.style.position = 'absolute';
-            dino.style.left = x + 'px';
-            dino.style.top = y + 'px';
+            clone.style.position = 'absolute';
+            clone.style.left = x + 'px';
+            clone.style.top = y + 'px';
           }
 
-          // Actualizar estadísticas del jugador
-          updatePlayerStats(playerId);
+          zona.classList.remove('zona-valida');
 
-          // Eliminar el dinosaurio colocado de los visibles del jugador
-          const playerDinos = currentVisibleDinos.get(playerId) || [];
-          const dinoIndex = playerDinos.findIndex(d => `player${playerId}-${d.key}-${playerDinos.indexOf(d)}` === dinoId);
-          if (dinoIndex !== -1) {
-            playerDinos.splice(dinoIndex, 1);
-            currentVisibleDinos.set(playerId, playerDinos);
-
-            // Incrementar contador de colocaciones del jugador
-            const currentPlacements = totalPlacements.get(playerId) || 0;
-            totalPlacements.set(playerId, currentPlacements + 1);
-
-            // Registrar que este jugador ha colocado en esta ronda
-            placementsThisRound.add(playerId);
-            console.log(`Jugador ${playerId} colocó. Colocaciones en esta ronda:`, placementsThisRound.size);
-            console.log(`Total de colocaciones del jugador ${playerId}:`, currentPlacements + 1);
-
-            // Comprobar si todos los jugadores han colocado en esta ronda
-            if (placementsThisRound.size === NUM_PLAYERS) {
-              console.log('Todos los jugadores han colocado. Rotando dinosaurios...');
-              rotateDinosaurs();
-              placementsThisRound.clear(); // Reiniciar para la siguiente ronda
-              roundNumber++;
-
-              // Comprobar si todos los jugadores han colocado sus 6 dinosaurios
-              let allPlayersFinished = true;
-              for (let i = 0; i < NUM_PLAYERS; i++) {
-                if ((totalPlacements.get(i) || 0) < DINOS_PER_DISTRIBUTION) {
-                  allPlayersFinished = false;
-                  break;
-                }
-              }
-
-              // Si todos completaron sus 6 dinosaurios y quedan dinosaurios en el pool, repartir nuevos
-              if (allPlayersFinished && sharedPool.length > 0) {
-                distributeNewDinosaurs();
-              }
+          // Quitar el dinosaurio de la lista visible del jugador (usar el índice parseado si corresponde)
+          if (parsedPlayer === playerId && !isNaN(parsedIdx) && parsedIdx >= 0 && parsedIdx < playerDinos.length) {
+            playerDinos.splice(parsedIdx, 1);
+            currentVisibleDinos.set(parsedPlayer, playerDinos);
+          } else {
+            // fallback: buscar por key
+            const key = dino.querySelector('img') ? dino.querySelector('img').alt : null;
+            const findIdx = playerDinos.findIndex(dd => dd.key === key);
+            if (findIdx !== -1) {
+              playerDinos.splice(findIdx, 1);
+              currentVisibleDinos.set(parsedPlayer, playerDinos);
             }
           }
 
-          // Recalcular puntuaciones para el jugador que acaba de colocar
-          try {
-            computeScoresForPlayer(playerId);
-          } catch (err) {
-            console.warn('Error al calcular puntuación del jugador', playerId, err);
+          // Re-renderizar el pool del jugador para que los ids e índices queden consistentes
+          generatePoolAndRenderForPlayer(playerId);
+
+          // Actualizar estadísticas y contadores
+          updatePlayerStats(playerId);
+          const currentPlacements = totalPlacements.get(playerId) || 0;
+          totalPlacements.set(playerId, currentPlacements + 1);
+          placementsThisRound.add(playerId);
+          console.log(`Jugador ${playerId} colocó. Colocaciones en esta ronda:`, placementsThisRound.size);
+          console.log(`Total de colocaciones del jugador ${playerId}:`, currentPlacements + 1);
+
+          // Si todos colocaron, rotar y/o repartir nueva ronda
+          if (placementsThisRound.size === NUM_PLAYERS) {
+            console.log('Todos los jugadores han colocado. Rotando dinosaurios...');
+            rotateDinosaurs();
+            placementsThisRound.clear();
+            roundNumber++;
+
+            let allPlayersFinished = true;
+            for (let i = 0; i < NUM_PLAYERS; i++) {
+              if ((totalPlacements.get(i) || 0) < DINOS_PER_DISTRIBUTION) { allPlayersFinished = false; break; }
+            }
+            if (allPlayersFinished && sharedPool.length > 0) distributeNewDinosaurs();
           }
 
-          // Pasar automáticamente al siguiente jugador después de colocar
+          // Recalcular puntuaciones
+          try { computeScoresForPlayer(playerId); } catch (err) { console.warn('Error al calcular puntuación del jugador', playerId, err); }
+
+          // Pasar al siguiente jugador después de un pequeño retraso
           setTimeout(() => {
             nextTurn();
             const tabElement = document.querySelector(`#player${activePlayerIndex}-tab`);
-            if (tabElement) {
-              const tab = new bootstrap.Tab(tabElement);
-              tab.show();
-            }
+            if (tabElement) { const tab = new bootstrap.Tab(tabElement); tab.show(); }
           }, 500);
         });
       });
@@ -420,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       }
-
+                    computeScoresForPlayer(playerId);
       if (btnReset) {
         btnReset.addEventListener('click', () => {
           if (confirm(`¿Seguro que quieres reiniciar el tablero de ${PLAYER_NAMES[i]}?`)) {
@@ -554,6 +546,104 @@ function rotateDinosaurs() {
 }
 
 // ---------------------- Puntuación por zonas ----------------------
+// Calcula la puntuación de la zona Lago (zona7)
+function calculateLagoScore(zonaElem) {
+  if (!zonaElem) return 0;
+  // Cada dinosaurio suma 1 punto
+  const dinos = zonaElem.querySelectorAll('.dino');
+  return dinos.length;
+}
+
+// Calcula la puntuación de la zona Montaña (zona4)
+function calculateMontanaScore(zonaElem) {
+  if (!zonaElem) return 0;
+  const dinos = zonaElem.querySelectorAll('.dino');
+  // 7 puntos si tiene exactamente 3 dinosaurios, 0 si tiene menos
+  return dinos.length === 3 ? 7 : 0;
+}
+
+// Calcula la puntuación de la zona Costa (zona6)
+function calculateCostaScore(zonaElem) {
+  if (!zonaElem) return 0;
+  const dinos = zonaElem.querySelectorAll('.dino');
+  
+  // Contar especies únicas
+  const species = new Set();
+  dinos.forEach(d => {
+    const img = d.querySelector('img');
+    const key = img ? img.alt : d.dataset.type || 'unknown';
+    species.add(key);
+  });
+  
+  const speciesCount = species.size;
+  
+  // Tabla de puntos según especies diferentes
+  const scoreTable = {
+    1: 1,
+    2: 3,
+    3: 6,
+    4: 10,
+    5: 15,
+    6: 21
+  };
+  
+  return scoreTable[speciesCount] || 0;
+}
+
+// Calcula la puntuación de la zona Desierto (zona5)
+function calculateDesiertoScore(zonaElem) {
+  if (!zonaElem) return 0;
+  const dinos = zonaElem.querySelectorAll('.dino');
+  
+  // Contar dinosaurios por tipo
+  const counts = {};
+  dinos.forEach(d => {
+    const img = d.querySelector('img');
+    const key = img ? img.alt : d.dataset.type || 'unknown';
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  
+  // Calcular parejas: cada 2 dinosaurios del mismo tipo = 1 pareja = 5 puntos
+  let totalScore = 0;
+  Object.values(counts).forEach(count => {
+    const pairs = Math.floor(count / 2); // Número de parejas completas
+    totalScore += pairs * 5;
+  });
+  
+  return totalScore;
+}
+
+// Calcula la puntuación de la zona Bosque (zona2)
+// Regla: Si el único dinosaurio en Bosque NO aparece en ninguna otra zona del mismo jugador, suma 7 puntos. De lo contrario, 0.
+function calculateBosqueScore(zonaElem, playerId) {
+  if (!zonaElem) return 0;
+  const dino = zonaElem.querySelector('.dino');
+  if (!dino) return 0; // No hay dino en Bosque
+  const img = dino.querySelector('img');
+  const key = img ? img.alt : dino.dataset.type || 'unknown';
+  console.debug('[Bosque] Jugador', playerId, 'clave bosque=', key);
+
+  // Revisar el resto de zonas del mismo jugador (1,3,4,5,6,7)
+  const otherZonaIds = [1,3,4,5,6,7].map(n => `player${playerId}-zona${n}`);
+  for (const zid of otherZonaIds) {
+    const z = document.getElementById(zid);
+    if (!z) continue;
+    const dinos = z.querySelectorAll('.dino');
+    for (const d of dinos) {
+      const i = d.querySelector('img');
+      const k = i ? i.alt : d.dataset.type || 'unknown';
+      if (k === key) {
+        console.debug('[Bosque] Encontrada misma especie en', zid, ' => sin puntos');
+      }
+      if (k === key) {
+        return 0; // Encontrado el mismo tipo en otra zona
+      }
+    }
+  }
+  console.debug('[Bosque] Especie única fuera de Bosque => +7');
+  return 7;
+}
+
 // Calcula la puntuación de la zona Pradera (zona1)
 function calculatePraderaScore(zonaElem) {
   if (!zonaElem) return 0;
@@ -593,12 +683,52 @@ function computeScoresForPlayer(playerId) {
   const zona1 = document.getElementById(`player${playerId}-zona1`);
   scores.pradera = calculatePraderaScore(zona1);
 
-  // (Otras zonas se implementarán más adelante)
+  // Zona 2: Bosque
+  const zona2 = document.getElementById(`player${playerId}-zona2`);
+  scores.bosque = calculateBosqueScore(zona2, playerId);
+
+  // Zona 4: Montaña
+  const zona4 = document.getElementById(`player${playerId}-zona4`);
+  scores.montana = calculateMontanaScore(zona4);
+
+  // Zona 5: Desierto
+  const zona5 = document.getElementById(`player${playerId}-zona5`);
+  scores.desierto = calculateDesiertoScore(zona5);
+
+  // Zona 6: Costa
+  const zona6 = document.getElementById(`player${playerId}-zona6`);
+  scores.costa = calculateCostaScore(zona6);
+
+  // Zona 7: Lago
+  const zona7 = document.getElementById(`player${playerId}-zona7`);
+  scores.lago = calculateLagoScore(zona7);
+
+  // Sumar total
   scores.total = Object.values(scores).reduce((s, v) => s + (v || 0), 0);
 
   // Actualizar la interfaz
   const scoreEl = document.getElementById(`player${playerId}-puntuacion`);
   if (scoreEl) scoreEl.textContent = scores.total;
+
+  // Si tienes un campo específico para el puntaje del lago, actualízalo aquí
+  const lagoEl = document.getElementById(`player${playerId}-puntuacion-lago`);
+  if (lagoEl) lagoEl.textContent = scores.lago;
+
+  // Si tienes un campo específico para el puntaje de montaña, actualízalo aquí
+  const montanaEl = document.getElementById(`player${playerId}-puntuacion-montana`);
+  if (montanaEl) montanaEl.textContent = scores.montana;
+
+  // Si tienes un campo específico para el puntaje de bosque, actualízalo aquí
+  const bosqueEl = document.getElementById(`player${playerId}-puntuacion-bosque`);
+  if (bosqueEl) bosqueEl.textContent = scores.bosque;
+
+  // Si tienes un campo específico para el puntaje de desierto, actualízalo aquí
+  const desiertoEl = document.getElementById(`player${playerId}-puntuacion-desierto`);
+  if (desiertoEl) desiertoEl.textContent = scores.desierto;
+
+  // Si tienes un campo específico para el puntaje de costa, actualízalo aquí
+  const costaEl = document.getElementById(`player${playerId}-puntuacion-costa`);
+  if (costaEl) costaEl.textContent = scores.costa;
 
   console.log(`Puntuaciones jugador ${playerId}:`, scores);
   return scores;
