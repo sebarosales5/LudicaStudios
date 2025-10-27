@@ -248,11 +248,11 @@
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header bg-success text-white">
-            <h5 class="modal-title" id="modalFinPartidaLabel">🏆 ¡Fin de la Partida!</h5>
+            <h5 class="modal-title" id="modalFinPartidaLabel">¡Fin de la Partida!</h5>
           </div>
           <div class="modal-body">
             <div class="text-center mb-4">
-              <h2 class="display-4">🎉 ¡Felicitaciones!</h2>
+              <h2 class="display-4">¡Felicitaciones!</h2>
               <h3 id="ganador-nombre" class="text-success"></h3>
               <p class="lead">Ha ganado la partida</p>
             </div>
